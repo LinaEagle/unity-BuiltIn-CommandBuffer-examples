@@ -1,5 +1,9 @@
 # Unity BuiltIn CommandBuffer Examples
 
+Examples contain:
+- Basic Command Buffer flow implementation
+- Mesh Drawer
+
 All scripts can be used independedntly. You can also notice, that all command buffer related scripts contain construction / deconstruction logic, this flow is recommended to achieve proper rendering without errors or dublication.
 
 This is quite important to understand a general [Built-In Render Pipeline Flow](https://imgbb.com/BLSGdPQ), considering your rendering path.
