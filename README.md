@@ -1,4 +1,4 @@
-# Unity BuiltIn CommandBuffer Examples
+# Unity Built-In CommandBuffer Examples
 
 Examples contain:
 - Basic Command Buffer flow implementation: construction / deconstruction
