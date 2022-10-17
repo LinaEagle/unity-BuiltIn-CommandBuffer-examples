@@ -3,6 +3,7 @@
 Examples contain:
 - Basic Command Buffer flow implementation: construction / deconstruction
 - Mesh Drawer
+- PostProcessing
 
 All scripts can be used independedntly. You can also notice, that all command buffer related scripts contain construction / deconstruction logic, this flow is recommended to achieve proper rendering without errors or dublication.
 
