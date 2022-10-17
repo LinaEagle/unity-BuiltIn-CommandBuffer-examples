@@ -15,6 +15,7 @@ public class CameraPostProcessingViaCommandBuffer : MonoBehaviour
     private void Awake()
     {
         _camera = GetComponent<Camera>();
+        _camera.forceIntoRenderTexture = true;
     }
 
     private void OnPreRender()
@@ -24,63 +25,38 @@ public class CameraPostProcessingViaCommandBuffer : MonoBehaviour
 
     private void CreateCommandBuffer()
     {
-        DestroyCommandBuffer();
-        InitializeCommandBuffer();
+        CommandBufferUtils.Destroy(_cBuffer, _commandBufferName, _cameraEvent, _camera);
+        _cBuffer = CommandBufferUtils.CreateNew(_commandBufferName);
 
-        //// vertically mirrored, BuiltinRenderTextureType.CurrentActive
-        //_cBuffer.GetTemporaryRT(_screenCopyID, -1, -1);
-        ////_cBuffer.Blit(BuiltinRenderTextureType.CurrentActive, BuiltinRenderTextureType.CurrentActive);
-        //_cBuffer.Blit(BuiltinRenderTextureType.CurrentActive, _screenCopyID);
-        //_cBuffer.Blit(_screenCopyID, BuiltinRenderTextureType.CurrentActive, _material);
-        //_cBuffer.ReleaseTemporaryRT(_screenCopyID);
-
-        // 
-        _cBuffer.GetTemporaryRT(_screenCopyID, -1, -1);
-        _cBuffer.Blit(BuiltinRenderTextureType.CurrentActive, _screenCopyID);
-        _cBuffer.Blit(_screenCopyID, BuiltinRenderTextureType.CurrentActive, _material);
-        _cBuffer.ReleaseTemporaryRT(_screenCopyID);
-
-        //// vertically mirrored, BuiltinRenderTextureType.CameraTarget
-        //_cBuffer.GetTemporaryRT(_screenCopyID, -1, -1);
-        //_cBuffer.Blit(BuiltinRenderTextureType.CameraTarget, _screenCopyID);
-        //_cBuffer.Blit(_screenCopyID, BuiltinRenderTextureType.CameraTarget, _material);
-        //_cBuffer.ReleaseTemporaryRT(_screenCopyID);
-
-        //// output is white
-        //_cBuffer.Blit(BuiltinRenderTextureType.CurrentActive, BuiltinRenderTextureType.CurrentActive, _material);
-        //// or
-        //_cBuffer.Blit(BuiltinRenderTextureType.CameraTarget, BuiltinRenderTextureType.CameraTarget, _material);
+        // Attempt1();
+        // Attempt2();
+        Attempt3();
 
         _camera.AddCommandBuffer(_cameraEvent, _cBuffer);
     }
 
-    private void InitializeCommandBuffer()
+    // flips image vertically
+    private void Attempt1()
     {
-        _cBuffer = new CommandBuffer();
-        _cBuffer.name = _commandBufferName;
-        _cBuffer.Clear();
+        // -1 means current screen size
+        _cBuffer.GetTemporaryRT(_screenCopyID, -1, -1);
+        _cBuffer.Blit(BuiltinRenderTextureType.CurrentActive, _screenCopyID);
+        _cBuffer.Blit(_screenCopyID, BuiltinRenderTextureType.CurrentActive, _material);
+        _cBuffer.ReleaseTemporaryRT(_screenCopyID);
     }
-
-    private void DestroyCommandBuffer()
+    
+    // renders white screen
+    private void Attempt2()
     {
-        if (_cBuffer != null)
-        {
-            _camera.RemoveCommandBuffer(_cameraEvent, _cBuffer);
-            _cBuffer.Clear();
-            _cBuffer.Dispose();
-            _cBuffer = null;
-        }
-
-        // Make sure we don't have any duplicates of our command buffer.
-        var commandBuffers = _camera.GetCommandBuffers(_cameraEvent);
-        foreach (var cBuffer in commandBuffers)
-        {
-            if (cBuffer.name.Equals(_commandBufferName))
-            {
-                _camera.RemoveCommandBuffer(_cameraEvent, cBuffer);
-                cBuffer.Clear();
-                cBuffer.Dispose();
-            }
-        }
+        _cBuffer.Blit(BuiltinRenderTextureType.CurrentActive, BuiltinRenderTextureType.CurrentActive, _material);
+    }
+    
+    private void Attempt3()
+    {
+        _cBuffer.GetTemporaryRT(_screenCopyID, -1, -1);
+        //_cBuffer.SetRenderTarget(_screenCopyID);
+        _cBuffer.Blit(BuiltinRenderTextureType.CameraTarget, _screenCopyID, _material);
+        _cBuffer.Blit(_screenCopyID, BuiltinRenderTextureType.CameraTarget);
+        _cBuffer.ReleaseTemporaryRT(_screenCopyID);
     }
 }
